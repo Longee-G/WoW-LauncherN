@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "WoW.Launcher": {
+      "commandName": "Project",
+      "commandLineArgs": "--path \"C:\\735-wowc\"",
+      "workingDirectory": "C:\\735-wowc"
+    }
+  }
+}

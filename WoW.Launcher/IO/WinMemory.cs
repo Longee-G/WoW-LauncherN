@@ -51,7 +51,10 @@ class WinMemory
 				return buffer.ToNint();
 			
 		}
-
+		catch(Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
 
 		return 0;
 	}
@@ -59,17 +62,42 @@ class WinMemory
 	public nint Read(long address) => Read((nint)address);
 	public byte[] Read(nint address, int size)
 	{
-		// TODO:
+		try
+		{
+			var buffer = new byte[size];
+			if (ReadProcessMemory(_processHandle, address, buffer, size, out var dummy))
+				return buffer;
+		}
+		catch(Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
+
 		return null;
 	}
 	public byte[] Read(long address, int size) => Read((nint)address, size);
 
 	public int ReadDataLength(nint address, string separator)
 	{
-		// TODO:
-		return 0;
+		var length = 0L;
+		var seperatorBytes = Encoding.UTF8.GetBytes(separator).Select(b => (short)b).ToArray();
+		var dataLength = 1000;
+
+		// Read in batches here.
+		while(length == 0)
+		{
+			length = Read(address, dataLength)?.FindPattern(seperatorBytes) ?? 0;
+			dataLength += 1000;
+
+			// Not found!
+			if (dataLength >= 100_000)	// 这个是什么写法？
+				return -1;
+		}
+
+		return (int)length;
 	}
 
+	// 在内存中写入数据？
 	public void Write(nint address, byte[] data, MemProtection newProtection = MemProtection.ReadWrite)
 	{
 		// TODO:

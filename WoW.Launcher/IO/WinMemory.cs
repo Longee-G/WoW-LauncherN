@@ -1,4 +1,5 @@
 ﻿using static WoW.Launcher.Misc.NativeWindows;
+using static WoW.Launcher.Misc.Helpers;
 
 namespace WoW.Launcher.IO;
 
@@ -100,14 +101,33 @@ class WinMemory
 	// 在内存中写入数据？
 	public void Write(nint address, byte[] data, MemProtection newProtection = MemProtection.ReadWrite)
 	{
-		// TODO:
+		try
+		{
+			// invoke Win32 API ...
+			VirtualProtectEx(_processHandle, address, (uint)data.Length, (uint)newProtection, out var oldProtect);
+
+			WriteProcessMemory(_processHandle, address, data, data.Length, out var written);
+			FlushInstructionCache(_processHandle, address, (uint)data.Length);
+
+			VirtualProtectEx(_processHandle, address, (uint)data.Length, oldProtect, out oldProtect);
+		}
+		catch(Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
 	}
 	public void Write(long address, byte[] data, MemProtection newProtection = MemProtection.ReadWrite) => Write((nint)address, data, newProtection);
 
 	// 在内存中打补丁 ... 
 	public Task PatchMemory(short[] pattern, byte[] patch, string patchName, bool ? printInfo = null)
 	{
-		// TODO:
+		printInfo ??= IsDebugBuild();
+
+		if (printInfo.Value)
+			Console.WriteLine($"[{patchName}] Patching...");
+
+
+	
 		return Task.CompletedTask;
 	}
 

@@ -10,6 +10,16 @@ namespace WoW.Launcher.Misc;
 
 static class Helpers
 {
+    public static bool IsDebugBuild()
+    {
+#if DEBUG
+        return true;
+#else
+        return false;
+#endif
+    }
+
+
     // 从文件中获取版本信息
     public static (int Major, int Minor, int Revision, int Build) GetVersionValueFromClient(string filename)
     {
